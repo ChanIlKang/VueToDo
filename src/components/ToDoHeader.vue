@@ -1,9 +1,5 @@
-<script>
-
-</script>
-
 <template>
-<h1>TO DO LIST</h1>
+<h1>SHOW ME WHAT YOU WILL DO!</h1>
 </template>
 
 <style scoped>

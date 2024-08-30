@@ -1,10 +1,8 @@
 <template>
-  <div id="app">
-    <ToDoHeader></ToDoHeader>
-    <ToDoInput v-on:addTodoItem="addOneItem"></ToDoInput>
-    <ToDoList v-bind:propsdata="toDoItems" v-on:removeItem="removeOneItem" v-on:toggleItem="toggleOneItem"></ToDoList>
-    <ToDoFooter v-on:clearToDo="clearAllItems"></ToDoFooter>
-  </div>
+  <ToDoHeader></ToDoHeader>
+  <ToDoInput @add="addTodoItem"></ToDoInput>
+  <ToDoList :todoItems="todoItems" @remove="removeTodoItem"></ToDoList>
+  <ToDoFooter></ToDoFooter>
 </template>
 
 <script>
@@ -12,47 +10,44 @@ import ToDoHeader from "@/components/ToDoHeader.vue";
 import ToDoInput from "@/components/ToDoInput.vue";
 import ToDoList from "@/components/ToDoList.vue";
 import ToDoFooter from "@/components/ToDoFooter.vue";
+import {ref} from "vue";
 
 export default {
-  data() {
-    return {
-      toDoItems: [],
-    }
-  },
-  methods: {
-    addOneItem(todoItem) {
-      const obj = {completed: false, item: todoItem}
-      localStorage.setItem(todoItem, JSON.stringify(obj));
-      this.toDoItems.push(obj);
-    },
-    removeOneItem(toDoItem, index) {
-      localStorage.removeItem(toDoItem.item);
-      this.toDoItems.splice(index, 1);
-    },
-    toggleOneItem(toDoItem, index) {
-      this.toDoItems[index].completed = !this.toDoItems[index].completed;
-
-      localStorage.removeItem(toDoItem.item);
-      localStorage.setItem(toDoItem.item, JSON.stringify(toDoItem));
-    },
-    clearAllItems() {
-      localStorage.clear();
-      this.toDoItems = [];
-    }
-  },
-  created() {
-    if (localStorage.length > 0) {
-      for (let i = 0; i < localStorage.length; i++) {
-        this.toDoItems.push(JSON.parse(localStorage.getItem(localStorage.key(i))));
-      }
-    }
-  },
   components: {
-    'ToDoHeader': ToDoHeader,
-    'ToDoInput': ToDoInput,
-    'ToDoList': ToDoList,
-    'ToDoFooter': ToDoFooter,
+    ToDoHeader,
+    ToDoInput,
+    ToDoList,
+    ToDoFooter,
   },
+  setup() {
+    const todoItems = ref([]);
+
+    function fetchTodos() {
+      const result = [];
+      for (let i = 0; i < localStorage.length; i++) {
+        const todoItem = localStorage.key(i);
+        result.push(todoItem);
+      }
+      return result;
+    }
+    todoItems.value = fetchTodos();
+
+    function addTodoItem(todo) {
+      todoItems.value.push(todo);
+      localStorage.setItem(todo, JSON.stringify(todo));
+    }
+
+    function removeTodoItem(item, index) {
+      todoItems.value.splice(index, 1);
+      localStorage.removeItem(item, item);
+    }
+
+    return {
+      todoItems,
+      addTodoItem,
+      removeTodoItem
+    }
+  }
 }
 </script>
 

@@ -1,49 +1,56 @@
 <template>
-  <div class="inputBox shadow">
-    <input type="text" v-model="newToDoItem" @keyup.enter="addToDo">
-    <span class="addContainer" v-on:click="addToDo">
-      <i class="fa-solid fa-plus addBtn"></i>
-    </span>
-
-    <Modal v-if="showModal" @close="showModal = false">
-      <template v-slot:header>
-        <h3>입력 없음</h3>
-        <i class="closeModalBtn fa-solid fa-xmark fa-sm" @click="showModal = false"></i>
-      </template>
-
-      <template v-slot:body>
-        <p>할 일을 입력하세요.</p>
-      </template>
-    </Modal>
+  <div>
+    <input type="text" v-model="todoInput"/>
+    <button @click="addTodo">추가</button>
   </div>
 </template>
 
 <script>
-import Modal from "./common/Modal.vue";
+// import Modal from "./common/Modal.vue";
+import {ref} from "vue";
 
 export default {
-  data: function () {
+  setup(props, context) {
+    const todoInput = ref('');
+
+    function addTodo() {
+      const todo = todoInput.value;
+      context.emit('add', todo);
+      clearTodo();
+    }
+
+    const clearTodo = () => todoInput.value = '';
+
     return {
-      newToDoItem: '',
-      showModal: false
+      todoInput,
+      addTodo
     }
   },
-  methods: {
-    addToDo() {
-      if (this.newToDoItem !== '') {
-        this.$emit('addTodoItem', this.newToDoItem);
-        this.clearInput();
-      } else {
-        this.showModal = !this.showModal;
-      }
-    },
-    clearInput() {
-      this.newToDoItem = '';
-    }
-  },
-  components: {
-    'Modal': Modal,
-  }
+  // data: function () {
+  //   return {
+  //     newToDoItem: '',
+  //     showModal: false
+  //   }
+  // },
+  // methods: {
+  //   addToDo() {
+  //     if (this.newToDoItem !== '') {
+  //       // this.$emit('addTodoItem', this.newToDoItem);
+  //       const trimedText = this.newToDoItem.trim();
+  //
+  //       this.$store.commit("addOneItem", trimedText);
+  //       this.clearInput();
+  //     } else {
+  //       this.showModal = !this.showModal;
+  //     }
+  //   },
+  //   clearInput() {
+  //     this.newToDoItem = '';
+  //   }
+  // },
+  // components: {
+  //   Modal,
+  // }
 }
 </script>
 
